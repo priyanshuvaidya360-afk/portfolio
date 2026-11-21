@@ -1,16 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { works } from "@/lib/works";
-import heroPmIllustration from "@/assets/hero-pm-illustration.jpg";
-import { PostHogIcon, ChurnkeyIcon } from "@/components/ToolIcons";
+import type { CSSProperties } from "react";
+import { works, getWork } from "@/lib/works";
+import { aboutCards, copy, hero, person, tools, toolsHeading } from "@/lib/site";
+import aboutPhoto from "@/assets/about-photo.jpg";
+import { SiteNav } from "@/components/site/nav";
+import { ContactSection, SiteFooter } from "@/components/site/contact";
+import { ProjectCard } from "@/components/site/project-card";
+import { HeroPhoto } from "@/components/site/hero-photo";
 import {
-  RoadmapDoodle,
-  KanbanDoodle,
-  NorthStarDoodle,
-  WireframeDoodle,
-  AnalyticsDoodle,
-  IdeaDoodle,
-  OKRDoodle,
-} from "@/components/PMDoodles";
+  BentoTile,
+  Button,
+  Reveal,
+  SectionHeader,
+  StatCallout,
+  Tag,
+  WordReveal,
+} from "@/components/site/ui";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,13 +24,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Priyanshu Vaidya — Product Manager blending user research, AI, and business strategy to solve complex B2B and consumer challenges.",
+          "Priyanshu Vaidya is a Product Manager who talks to users, finds the real problem and ships the fix, from AI agents to live SaaS features.",
       },
       { property: "og:title", content: "Priyanshu Vaidya — Product Manager" },
       {
         property: "og:description",
-        content:
-          "Product Manager blending user research, AI, and business strategy.",
+        content: "A Product Manager who finds the real problem and ships the fix.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -34,331 +38,351 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const IMG = "https://framerusercontent.com/images";
-
-interface ProductTool {
-  name: string;
-  icon?: string;
-  component?: React.ReactNode;
-}
-
-const tools: ProductTool[] = [
-  {
-    name: "Figma",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg",
-  },
-  {
-    name: "ChatGPT",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
-  },
-  {
-    name: "Framer",
-    icon: `${IMG}/JMH2Clnl4mQx7hrDfSXujXDNPBY.png?width=1024&height=1024`,
-  },
-  {
-    name: "Mixpanel",
-    icon: `${IMG}/c8wZzCEYqTQqDEWpDlhRaBHWNE.webp?width=1280&height=1280`,
-  },
-  {
-    name: "PostHog",
-    component: <PostHogIcon className="w-8 h-8" />,
-  },
-  {
-    name: "Churnkey",
-    component: <ChurnkeyIcon className="w-8 h-8" />,
-  },
-  {
-    name: "Canva",
-    icon: `${IMG}/fpL2tfKhUIMrjaiJxqcRfeqiBM4.png?width=1000&height=1000`,
-  },
-  {
-    name: "Microsoft Copilot",
-    icon: `${IMG}/BK8qMrtDynrYUprPzGeC7AZdJY.png?width=600&height=600`,
-  },
-  {
-    name: "Claude AI",
-    icon: `${IMG}/jIQ9aYsNwbinLNzcfutfqVaDSdk.webp?width=512&height=512`,
-  },
-  {
-    name: "v0 by Vercel",
-    icon: `${IMG}/8w05iauOZHD1uBrq4agHIOKabU.png?width=1200&height=630`,
-  },
-  {
-    name: "Google Gemini",
-    icon: `${IMG}/refNMfyJekgKNpxwR4HMRj0ZNXw.png?width=2826&height=2624`,
-  },
-];
+const container = "mx-auto max-w-[1280px] px-4 sm:px-6";
 
 function Index() {
   return (
-    <div className="min-h-screen bg-[#faf7fd] text-[#2e1065] font-sans">
-      {/* Nav */}
-      <header className="sticky top-0 z-40 backdrop-blur bg-[#faf7fd]/80 border-b border-[#7c3aed]/10">
-        <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-lg text-[#2e1065]">
-            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#a855f7] to-[#7c3aed] flex items-center justify-center text-white text-sm font-bold shadow-sm">
-              P
-            </span>
-            Priyanshu
-          </Link>
-          <nav className="flex items-center gap-6 text-sm">
-            <a href="#work" className="hover:text-[#7c3aed] transition font-medium">Work</a>
-            <a href="#about" className="hover:text-[#7c3aed] transition font-medium">About</a>
-            <a
-              href="https://drive.google.com/file/d/1Rmc_A1Dk5Ii5ILP0XCpduIw_kiPYCNif/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#7c3aed] transition font-medium flex items-center gap-1"
-            >
-              Resume ↗
-            </a>
-            <a
-              href="#contact"
-              className="rounded-full bg-[#3b0764] text-white px-5 py-2 hover:bg-[#581c87] transition font-medium shadow-sm"
-            >
-              Contact
-            </a>
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 pt-12 pb-16 md:pt-20 md:pb-24">
-        <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#7c3aed]/10 text-[#7c3aed] px-4 py-1.5 text-sm font-medium mb-6">
-              <span className="animate-pulse">👋</span>
-              <span>Hello there!</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              <span className="text-[#2e1065]/40">I'm</span>{" "}
-              <span className="bg-gradient-to-r from-[#7c3aed] via-[#9333ea] to-[#c084fc] bg-clip-text text-transparent">
-                Priyanshu
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-[#7c3aed] via-[#9333ea] to-[#c084fc] bg-clip-text text-transparent">
-                Vaidya
-              </span>
-            </h1>
-            <p className="mt-6 md:mt-8 max-w-xl text-lg md:text-xl text-[#2e1065]/75 leading-relaxed">
-              I'm a{" "}
-              <span className="font-semibold text-[#2e1065]">Product Manager</span>{" "}
-              building AI-driven solutions across{" "}
-              <span className="font-semibold text-[#2e1065]">health insurtech</span>,{" "}
-              <span className="font-semibold text-[#2e1065]">automation</span> and{" "}
-              <span className="font-semibold text-[#2e1065]">SaaS</span> — turning research and data into products that scale.
-            </p>
-            <div className="mt-8 md:mt-10 flex flex-wrap gap-4 items-center">
-              <a
-                href="#work"
-                className="inline-flex items-center gap-2 rounded-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-6 py-3 font-medium transition shadow-lg shadow-[#7c3aed]/25"
-              >
-                View My Works
-              </a>
-              <a
-                href="https://drive.google.com/file/d/1Rmc_A1Dk5Ii5ILP0XCpduIw_kiPYCNif/view?usp=sharing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-white hover:bg-[#faf5ff] text-[#7c3aed] border border-[#7c3aed]/30 px-6 py-3 font-medium transition shadow-sm"
-              >
-                View Resume ↗
-              </a>
-            </div>
-          </div>
-
-          {/* Problem Solver PM Illustration */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#c084fc]/25 to-[#7c3aed]/25 rounded-[2.5rem] blur-2xl scale-95" />
-            <div className="relative rounded-3xl overflow-hidden border border-[#7c3aed]/20 bg-white shadow-2xl hover:shadow-[#7c3aed]/15 transition duration-500">
-              <img
-                src={heroPmIllustration}
-                alt="Priyanshu Vaidya - Product Manager & Problem Solver"
-                className="w-full h-auto object-cover transform hover:scale-102 transition duration-500"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Marquee-ish work strip */}
-      <section className="overflow-hidden py-6 border-y border-[#7c3aed]/10 bg-[#f5f0ff]">
-        <div className="flex gap-6 animate-[scroll_40s_linear_infinite] w-max">
-          {[...works, ...works, ...works].map((w, i) => (
-            <img
-              key={i}
-              src={w.img}
-              alt={w.title}
-              className="h-40 md:h-56 rounded-2xl object-cover shadow-sm border border-[#7c3aed]/10"
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* About */}
-      <section id="about" className="mx-auto max-w-6xl px-6 py-24">
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            {
-              doodle: <IdeaDoodle className="w-12 h-12 text-[#7c3aed] mb-4" />,
-              title: "Who am I?",
-              body: "I'm someone who enjoys breaking down complex problems and finding simple, practical ways to solve them.",
-              accent: "from-[#c084fc]/15 to-transparent",
-            },
-            {
-              doodle: <OKRDoodle className="w-12 h-12 text-[#9333ea] mb-4" />,
-              title: "My Philosophy",
-              body: "The best solutions come from curiosity, continuous learning, and a willingness to challenge assumptions.",
-              accent: "from-[#a855f7]/15 to-transparent",
-            },
-            {
-              doodle: <AnalyticsDoodle className="w-12 h-12 text-[#7c3aed] mb-4" />,
-              title: "My Distinct Edge",
-              body: "I combine strategic thinking with hands-on execution, allowing me to move from ideas to outcomes quickly.",
-              accent: "from-[#7c3aed]/15 to-transparent",
-            },
-          ].map((c) => (
-            <div
-              key={c.title}
-              className="relative rounded-3xl bg-white p-8 border border-[#7c3aed]/10 shadow-sm hover:shadow-md hover:-translate-y-1 transition overflow-hidden"
-            >
-              <div className={`absolute inset-0 bg-gradient-to-br ${c.accent} pointer-events-none`} />
-              <div className="relative">
-                {c.doodle}
-                <h3 className="text-xl font-semibold mb-2 text-[#2e1065]">{c.title}</h3>
-                <p className="text-[#2e1065]/75 leading-relaxed">{c.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Skills strip */}
-        <div className="mt-16 text-center">
-          <p className="text-sm uppercase tracking-widest text-[#2e1065]/50 mb-6 font-medium">
-            Skilled in modern Product tools
-          </p>
-          <div className="flex flex-wrap justify-center gap-5">
-            {tools.map((t) => (
-              <div
-                key={t.name}
-                title={t.name}
-                className="group relative w-14 h-14 rounded-2xl bg-white border border-[#7c3aed]/10 shadow-sm p-2.5 flex items-center justify-center hover:scale-110 hover:border-[#7c3aed]/40 hover:shadow-md transition duration-200 cursor-pointer"
-              >
-                {t.icon ? (
-                  <img src={t.icon} alt={t.name} className="max-w-full max-h-full object-contain" />
-                ) : (
-                  t.component
-                )}
-
-                {/* Floating Tooltip on Hover */}
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 transition duration-200 pointer-events-none z-30">
-                  <div className="bg-[#2e1065] text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap">
-                    {t.name}
-                  </div>
-                  <div className="w-2 h-2 bg-[#2e1065] rotate-45 mx-auto -mt-1" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Works */}
-      <section id="work" className="mx-auto max-w-6xl px-6 py-24">
-        <div className="flex items-end justify-between mb-10">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-            Selected <span className="italic text-[#7c3aed]">Work</span>
-          </h2>
-          <span className="text-sm text-[#2e1065]/60 font-medium">1+ year experience</span>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {works.map((w) => (
-            <Link
-              key={w.title}
-              to="/work/$slug"
-              params={{ slug: w.slug }}
-              className="group rounded-3xl overflow-hidden bg-white border border-[#7c3aed]/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition"
-            >
-              <div className="aspect-[16/10] overflow-hidden bg-[#f5f0ff]">
-                <img
-                  src={w.img}
-                  alt={w.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-semibold text-[#2e1065]">{w.title}</h3>
-                <p className="mt-2 text-[#2e1065]/75">{w.desc}</p>
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="flex gap-2 text-xs">
-                    <span className="rounded-full bg-[#7c3aed]/10 text-[#7c3aed] px-3 py-1 font-medium">
-                      {w.tag}
-                    </span>
-                    <span className="rounded-full bg-[#c084fc]/15 text-[#6d28d9] px-3 py-1 font-medium">
-                      {w.sub}
-                    </span>
-                  </div>
-                  <span className="text-sm text-[#7c3aed] font-medium opacity-0 group-hover:opacity-100 transition">
-                    View case study →
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Contact */}
-      <section id="contact" className="mx-auto max-w-6xl px-6 py-24">
-        <div className="relative rounded-[2rem] bg-gradient-to-br from-[#3b0764] via-[#581c87] to-[#7e22ce] text-white p-12 md:p-20 text-center overflow-hidden shadow-2xl">
-          <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#c084fc]/20 blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-[#a855f7]/20 blur-3xl" />
-          <div className="relative max-w-xl mx-auto">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Let's <span className="italic text-[#e9d5ff]">Connect</span>
-            </h2>
-            <p className="mt-4 text-white/85 text-lg leading-relaxed">
-              I'm open to new opportunities, product discussions, or just a good conversation.
-            </p>
-            <div className="mt-8 font-mono text-lg md:text-xl text-[#e9d5ff] flex flex-wrap justify-center items-center gap-4">
-              <a href="mailto:priyanshuvaidya360@gmail.com" className="hover:underline hover:text-white transition">
-                priyanshuvaidya360@gmail.com
-              </a>
-              <span className="opacity-50">•</span>
-              <a href="tel:+917805026022" className="hover:underline hover:text-white transition">
-                +91 7805026022
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer className="mx-auto max-w-6xl px-6 py-10 text-sm text-[#2e1065]/60 flex flex-wrap justify-between items-center gap-4 border-t border-[#7c3aed]/10 font-medium">
-        <span>© {new Date().getFullYear()} Priyanshu Vaidya</span>
-        <div className="flex flex-wrap items-center gap-6">
-          <a href="mailto:priyanshuvaidya360@gmail.com" className="hover:text-[#7c3aed] transition">
-            priyanshuvaidya360@gmail.com
-          </a>
-          <a href="tel:+917805026022" className="hover:text-[#7c3aed] transition">
-            +91 7805026022
-          </a>
-          <a
-            href="https://drive.google.com/file/d/1Rmc_A1Dk5Ii5ILP0XCpduIw_kiPYCNif/view?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[#7c3aed] transition font-semibold"
-          >
-            Resume ↗
-          </a>
-        </div>
-      </footer>
-
-      <style>{`
-        @keyframes scroll {
-          from { transform: translateX(0); }
-          to { transform: translateX(-33.333%); }
-        }
-      `}</style>
+    <div className="min-h-screen bg-canvas text-ink">
+      <SiteNav />
+      <main id="main">
+        <Hero />
+        <AtAGlance />
+        <Work />
+        <About />
+        <ContactSection />
+      </main>
+      <SiteFooter />
     </div>
   );
 }
 
+/* ── Hero ─────────────────────────────────────────────────── */
+
+function Hero() {
+  return (
+    <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden">
+      {/* Background: dot grid + slow gradient mesh */}
+      <div className="dot-grid pointer-events-none absolute inset-0" aria-hidden />
+      <div
+        className="mesh pointer-events-none absolute -right-[20%] -top-[30%] h-[80vh] w-[80vh] rounded-full opacity-70 blur-3xl"
+        style={{ background: "radial-gradient(circle, var(--brand-soft), transparent 65%)" }}
+        aria-hidden
+      />
+
+      <div
+        className={`${container} relative grid items-center gap-12 pb-20 pt-32 md:pb-28 md:pt-44 lg:grid-cols-12 lg:gap-8`}
+      >
+        <div className="min-w-0 lg:col-span-7">
+          <div
+            className="word-in t-label flex flex-wrap items-center gap-x-3 gap-y-2"
+            style={{ "--d": "0ms" } as CSSProperties}
+          >
+            <span>{hero.greeting}</span>
+            <span aria-hidden>·</span>
+            <span>{person.role}</span>
+            {person.location && (
+              <>
+                <span aria-hidden>·</span>
+                <span>{person.location}</span>
+              </>
+            )}
+            <span aria-hidden>·</span>
+            <span className="flex items-center gap-2 text-ink">
+              <span className="live-dot" aria-hidden />
+              {hero.status}
+            </span>
+          </div>
+
+          <h1 id="hero-title" className="t-hero mt-8 md:mt-10 lg:text-[clamp(72px,8.2vw,124px)]">
+            <span className="text-subtle">
+              <WordReveal text="I'm" start={80} />
+            </span>{" "}
+            <WordReveal text={person.firstName} start={150} />
+            <br />
+            <span className="serif-accent text-[1.08em] leading-[0.85]">
+              <WordReveal text={person.lastName} start={220} />
+            </span>
+          </h1>
+
+          <p
+            className="word-in mt-10 text-[clamp(20px,1.6vw,26px)] leading-[1.45] tracking-[-0.015em] text-subtle md:mt-12"
+            style={{ "--d": "380ms", maxWidth: "36ch" } as CSSProperties}
+          >
+            {hero.intro.map((part, i) =>
+              part.strong ? (
+                <strong key={i} className="font-medium text-ink">
+                  {part.text}
+                </strong>
+              ) : part.secondary ? (
+                <span key={i} className="text-ink/80">
+                  {part.text}
+                </span>
+              ) : (
+                <span key={i}>{part.text}</span>
+              ),
+            )}
+          </p>
+          <div
+            className="word-in mt-10 flex flex-wrap items-center gap-3"
+            style={{ "--d": "500ms" } as CSSProperties}
+          >
+            <Button href="#work" magnetic>
+              {hero.primaryCta}
+              <span aria-hidden>↓</span>
+            </Button>
+            <Button href={person.resume} variant="secondary" external>
+              {hero.secondaryCta}
+            </Button>
+          </div>
+        </div>
+
+        <div
+          className="word-in mx-auto w-full max-w-[420px] sm:max-w-[480px] lg:col-span-5 lg:max-w-none"
+          style={{ "--d": "300ms" } as CSSProperties}
+        >
+          <HeroPhoto />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── At a glance (bento) ──────────────────────────────────── */
+
+function AtAGlance() {
+  const refermint = getWork("refermint");
+  const mcp = getWork("saleshandy-mcp");
+  const surveyStat = refermint?.stats?.[0];
+  const [expValue, ...expRest] = person.experience.split(" ");
+
+  return (
+    <section aria-labelledby="glance-title" className={`${container} py-16 md:py-24`}>
+      <h2 id="glance-title" className="sr-only">
+        {copy.glance.eyebrow}
+      </h2>
+      <Reveal className="t-label mb-8 flex items-center gap-3">
+        <span className="text-brand-ink">01</span>
+        <span className="h-px w-8 bg-line-strong" aria-hidden />
+        <span>{copy.glance.eyebrow}</span>
+      </Reveal>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">
+        {/* Role + domains */}
+        <BentoTile className="md:col-span-2 lg:col-span-7">
+          <span className="t-label">{copy.glance.role}</span>
+          <div className="mt-auto pt-16">
+            <div className="t-h2">{person.role}</div>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {hero.domains.map((d) => (
+                <Tag key={d} tone="brand">
+                  {d}
+                </Tag>
+              ))}
+              {hero.secondaryDomains.map((d) => (
+                <Tag key={d}>{d}</Tag>
+              ))}
+            </div>
+          </div>
+        </BentoTile>
+
+        {/* Experience */}
+        <BentoTile delay={60} className="lg:col-span-5">
+          <span className="t-label">{copy.glance.experience}</span>
+          <div className="mt-auto pt-16">
+            <StatCallout value={expValue} label={expRest.join(" ")} />
+          </div>
+        </BentoTile>
+
+        {/* Currently building */}
+        {refermint && (
+          <BentoTile delay={0} className="lg:col-span-4">
+            <div className="flex items-start justify-between gap-3">
+              <Tag tone="live">{refermint.status}</Tag>
+            </div>
+            <div className="mt-auto pt-12">
+              <div className="t-h3">{refermint.title}</div>
+              <p className="mt-2 text-[15px] leading-relaxed text-subtle">{refermint.sub}</p>
+              <Link
+                to="/work/$slug"
+                params={{ slug: refermint.slug }}
+                className="link-u mt-4 inline-block text-[15px] font-medium text-brand-ink"
+              >
+                {copy.glance.buildingCta}
+              </Link>
+            </div>
+          </BentoTile>
+        )}
+
+        {/* Headline metric */}
+        {refermint && surveyStat && (
+          <BentoTile delay={60} className="lg:col-span-4">
+            <span className="t-label">{copy.glance.discovery}</span>
+            <div className="mt-auto pt-12">
+              <StatCallout
+                value={surveyStat.value}
+                label={surveyStat.label}
+                source={refermint.title}
+              />
+            </div>
+          </BentoTile>
+        )}
+
+        {/* Shipped to production */}
+        {mcp && (
+          <BentoTile delay={120} className="lg:col-span-4">
+            <div className="flex items-start justify-between gap-3">
+              <Tag tone="live">{mcp.status}</Tag>
+            </div>
+            <div className="mt-auto pt-12">
+              <div className="t-h3">{mcp.title}</div>
+              <p className="mt-2 text-[15px] leading-relaxed text-subtle">{mcp.sub}</p>
+              <Link
+                to="/work/$slug"
+                params={{ slug: mcp.slug }}
+                className="link-u mt-4 inline-block text-[15px] font-medium text-brand-ink"
+              >
+                {copy.glance.shippedCta}
+              </Link>
+            </div>
+          </BentoTile>
+        )}
+
+        {/* Toolkit */}
+        <BentoTile className="md:col-span-2 lg:col-span-8">
+          <span className="t-label">{toolsHeading}</span>
+          <ul className="mt-8 flex flex-wrap gap-2">
+            {tools.map((t) => (
+              <li
+                key={t.name}
+                className="flex min-h-11 items-center gap-2.5 rounded-full border border-line bg-canvas py-1.5 pl-1.5 pr-4 text-[14px] transition-colors hover:border-line-strong"
+              >
+                <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-white p-1.5">
+                  {t.Icon ? (
+                    <t.Icon className="h-full w-full" />
+                  ) : (
+                    <img
+                      src={t.icon}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-contain"
+                    />
+                  )}
+                </span>
+                {t.name}
+              </li>
+            ))}
+          </ul>
+        </BentoTile>
+
+        {/* Contact */}
+        <BentoTile delay={60} className="md:col-span-2 lg:col-span-4">
+          <span className="t-label">{copy.glance.contact}</span>
+          <div className="mt-auto space-y-2 pt-12">
+            <a
+              href={`mailto:${person.email}`}
+              className="link-u block break-all text-lg font-medium tracking-[-0.02em]"
+            >
+              {person.email}
+            </a>
+            <a
+              href={person.phoneHref}
+              className="link-u inline-block font-mono text-[14px] text-subtle hover:text-ink"
+            >
+              {person.phone}
+            </a>
+          </div>
+        </BentoTile>
+      </div>
+    </section>
+  );
+}
+
+/* ── Selected work ────────────────────────────────────────── */
+
+function Work() {
+  return (
+    <section id="work" aria-labelledby="work-title" className={`${container} py-24 md:py-36`}>
+      <SectionHeader
+        id="work-title"
+        index="02"
+        eyebrow={copy.work.eyebrow}
+        title={
+          <>
+            {copy.work.title[0]}{" "}
+            <span className="serif-accent text-brand-ink">{copy.work.title[1]}</span>
+          </>
+        }
+        aside={`${works.length} projects · ${person.experience}`}
+      />
+      <div className="space-y-6 md:space-y-8">
+        {works.map((w, i) => (
+          <ProjectCard key={w.slug} work={w} index={i} flip={i % 2 === 1} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ── About ────────────────────────────────────────────────── */
+
+function About() {
+  const [first, ...rest] = aboutCards;
+  return (
+    <section id="about" aria-labelledby="about-title" className={`${container} py-24 md:py-36`}>
+      <Reveal className="t-label mb-12 flex items-center gap-3 md:mb-16">
+        <span className="text-brand-ink">03</span>
+        <span className="h-px w-8 bg-line-strong" aria-hidden />
+        <span>{copy.about.eyebrow}</span>
+      </Reveal>
+
+      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+        <Reveal className="lg:col-span-5">
+          <figure className="group relative overflow-hidden rounded-3xl border border-line bg-surface-2 lg:sticky lg:top-28">
+            <img
+              src={aboutPhoto}
+              alt={copy.about.photoAlt}
+              width={960}
+              height={1275}
+              loading="lazy"
+              decoding="async"
+              className="h-auto w-full transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
+            />
+            <figcaption className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/15 bg-black/55 px-4 py-3 text-[15px] text-white backdrop-blur-md">
+              {copy.about.photoCaption}
+            </figcaption>
+          </figure>
+        </Reveal>
+
+        <div className="lg:col-span-7">
+          <Reveal as="h2" id="about-title" className="t-label !text-brand-ink">
+            {first.title}
+          </Reveal>
+          <Reveal
+            as="p"
+            delay={60}
+            className="mt-6 text-[clamp(28px,3.2vw,44px)] font-medium leading-[1.15] tracking-[-0.03em]"
+          >
+            {first.body}
+          </Reveal>
+
+          <div className="mt-16 divide-y divide-line border-y border-line">
+            {rest.map((c, i) => (
+              <Reveal
+                key={c.title}
+                delay={i * 60}
+                className="grid gap-3 py-8 sm:grid-cols-[200px_1fr] sm:gap-8"
+              >
+                <h3 className="font-mono text-[13px] uppercase tracking-[0.06em] text-subtle">
+                  <span className="mr-3 text-brand-ink">{String(i + 2).padStart(2, "0")}</span>
+                  {c.title}
+                </h3>
+                <p className="text-lg leading-relaxed">{c.body}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

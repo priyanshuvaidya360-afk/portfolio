@@ -1,8 +1,13 @@
-import claimwiseImg from "@/assets/work-claimwise.jpg";
-import spotifyImg from "@/assets/work-spotify.jpg";
-import sportskeedaImg from "@/assets/work-sportskeeda.jpg";
-import uberImg from "@/assets/work-uber.jpg";
-import refermintImg from "@/assets/work-refermint.jpg";
+import claimwiseImg from "@/assets/work-claimwise.svg";
+import spotifyImg from "@/assets/work-spotify.svg";
+import sportskeedaImg from "@/assets/work-sportskeeda.svg";
+import uberImg from "@/assets/work-uber.svg";
+import refermintImg from "@/assets/work-refermint.svg";
+import gtmSignalImg from "@/assets/work-gtm-signal.svg";
+import mcpCoverImg from "@/assets/work-mcp-cover.png";
+import mcpPageImg from "@/assets/work-mcp-page.png";
+import mcpStep1Img from "@/assets/work-mcp-step1.png";
+import mcpStep2Img from "@/assets/work-mcp-step2.png";
 
 export type Solution = { title: string; desc: string };
 
@@ -25,6 +30,8 @@ export type ExtraSection = {
   steps?: string[];
 };
 
+export type GalleryImage = { src: string; caption: string };
+
 export type Work = {
   slug: string;
   title: string;
@@ -35,6 +42,8 @@ export type Work = {
   status?: string;
   href?: string;
   ctaLabel?: string;
+  ctaTitle?: string;
+  docLabel?: string;
   prototype?: string;
   prototypeLabel?: string;
   duration: string;
@@ -54,6 +63,9 @@ export type Work = {
   stats?: Stat[];
   table?: TableBlock;
   extraSections?: ExtraSection[];
+  gallery?: GalleryImage[];
+  /** External source where the problem statement comes from. */
+  problemSource?: { org: string; title: string; publication: string; date: string; href: string };
 };
 
 export const works: Work[] = [
@@ -214,6 +226,288 @@ export const works: Work[] = [
     ],
     keyChallenges:
       "Building the product has revealed a much larger set of PM problems: trust (why would an employee refer someone they don't know?), incentives (what motivates employees to spend their time helping candidates?), marketplace liquidity (how do you ensure candidates can find relevant referrers when they need them?), quality (how do you prevent candidates from requesting referrals indiscriminately?), conversion (request → referral → interview → offer → job) and retention (what makes a successful candidate or referrer return?). These are now more important product questions than simply adding features.",
+  },
+  {
+    slug: "gtm-signal",
+    title: "GTM Signal",
+    desc: "An AI agent for the #1 unsolved GTM problem stated by Clay, signal aggregation. It turns one prospect name into a researched, fact-checked cold email draft a sales rep can review in under a minute.",
+    tag: "AI Agent",
+    sub: "Problem by Clay · End-to-end Build",
+    img: gtmSignalImg,
+    href: "https://zamp-sdr.vercel.app/",
+    prototype: "https://zamp-sdr.vercel.app/",
+    prototypeLabel: "Live Demo",
+    problemSource: {
+      org: "Clay",
+      title: "Five unsolved GTM problems",
+      publication: "The GTM Engineer by Clay",
+      date: "Sep 3, 2025",
+      href: "https://thegtme.com/p/five-unsolved-gtm-problems",
+    },
+    docLabel: "Open Live Demo ↗",
+    ctaLabel: "Open Live Demo ↗",
+    ctaTitle: "Run the agent on a prospect and watch each stage live",
+    duration: "1 week (2026)",
+    role: "Product Manager / Builder",
+    stack: ["Claude (LLM)", "Python", "JSON Schema", "Prompt Design", "Vercel"],
+    overview: [
+      "I built an AI agent that turns a single prospect name into a researched, fact-checked cold email draft that a sales rep can review in under a minute. The problem it solves was stated by Clay: their GTM Engineer newsletter (“Five unsolved GTM problems”, Sep 3, 2025) names signal aggregation as the #1 unsolved problem in go-to-market. I built it as a case study on personalised outreach, from prospect to draft, for a B2B seller of AI employees for finance operations.",
+      "The agent researches the prospect, extracts dated and sourced buying signals, scores them with transparent rules, picks the one best hook for that person's role, and writes a short email grounded only in evidence it can quote. A human always approves before anything is sent.",
+    ],
+    stats: [
+      { value: "7", label: "agent stages, visible live" },
+      { value: "17", label: "signal types mapped to 8 pains" },
+      { value: "5", label: "buyer personas" },
+      { value: "<1 min", label: "for a rep to review a draft" },
+    ],
+    problem:
+      "B2B outreach lives or dies on the first message, and the gap between a generic email and a relevant one is research. An SDR working 200 prospects cannot spend 20 minutes on each, so they swap in the company name and send at scale, and reply rates suffer. The signals usually exist: job posts, funding news, leadership changes, ERP migrations, executive interviews. The hard part is deciding which one matters for this person, right now, and saying why.",
+    painPoints: [
+      "Too many signals: when every account triggers something, nothing feels important.",
+      "Irrelevant signals: not every job change or page visit reflects real buying intent.",
+      "No prioritisation: signals aren't weighted, so reps can't separate intent from noise.",
+      "Poor delivery: signals arrive as Slack pings or spreadsheet rows with no clear next action.",
+      "Judgment doesn't scale: new reps lack veteran instincts, and off-the-shelf tools show every company the same signals.",
+    ],
+    research: [
+      "Seller profile: what the seller offers (AI employees for finance ops, vendor onboarding, GTM and compliance), its 8 customer pains (P1 to P8), approved proof points and voice rules.",
+      "Personas: CFO, VP Finance/Controller, VP Procurement/Ops, VP Sales/RevOps and Compliance Officer, each tied to one angle and the language that lands with them.",
+      "Ideal customer profile: banks and fintechs (500 to 10,000+ employees) first, then Series B+ SaaS, services and manufacturing, then accounting firms, across the US, UK, India, Singapore and UAE.",
+      'Signal-to-pain map: 17 signal types, each tied to pains and an angle. For example, an open AP Specialist role points to P1 (manual AP) and P2 (cannot scale), so the angle is "invoice volume is outrunning the team".',
+      "Never-use list: layoffs, lawsuits, fraud, forced exits, accidents and anything over 12 months old are never a hook. Personal life is never extracted.",
+      "Do-not-contact rules: existing customers, open deals, off-persona roles, companies under 100 employees and direct competitors are filtered out before research runs.",
+    ],
+    keyInsight:
+      "Clay's GTM Engineer newsletter (\"Five unsolved GTM problems\", Sep 3, 2025) names signal aggregation as GTM's #1 unsolved problem: too much noise, not enough action. Finding signals is not the hard part. Ranking them for a specific seller and buyer is.",
+    opportunity:
+      "Solve Clay's problem at the level of a single prospect for a single seller: encode a senior rep's judgment as explicit, tunable rules, and give the rep one hook, a reason and a ready draft instead of a raw feed.",
+    table: {
+      title: "How the Agent Answers Clay's Pain Points",
+      headers: ["Clay's pain point", "How the agent handles it"],
+      rows: [
+        [
+          "Irrelevant signals",
+          "Extraction limited to 17 signal types mapped to the seller's 8 pains; anything else is other_news and only a weak fallback",
+        ],
+        [
+          "No prioritisation",
+          "Transparent score per signal: base by type, boosts for person-level, confidence, persona fit and source quality, plus a recency multiplier",
+        ],
+        [
+          "Company-specific relevance",
+          "All weights live in one config built from the seller's own profile, so they can be retuned per company",
+        ],
+        [
+          "Poor delivery",
+          "One hook, two runners-up, a status, a one-line reason and a ready draft, not a raw feed",
+        ],
+        [
+          "Judgment doesn't scale",
+          "Scoring rules encode a senior rep's judgment, including what never to use",
+        ],
+      ],
+    },
+    solutions: [
+      {
+        title: "Contracts before code",
+        desc: "Seller profile, signal schema and scoring spec written as versioned Markdown plus JSON Schema, so the LLM steps and the deterministic code agree on exact IDs and every output can be checked automatically.",
+      },
+      {
+        title: "LLM reads, code decides",
+        desc: "Claude reads messy web pages and returns structured signals with exact evidence quotes. Choosing the hook is plain Python, so every choice is explainable and reproducible.",
+      },
+      {
+        title: "Fact-checked drafts",
+        desc: "Each signal stores its source quote; every claim in the email is matched against those quotes before the rep sees it.",
+      },
+      {
+        title: "Live run view + dashboard",
+        desc: "Every stage is visible as it runs, and each run is stored with its status, hook, runners-up and draft.",
+      },
+    ],
+    extraSections: [
+      {
+        title: "How the Agent Works",
+        paras: [
+          "A rep enters a prospect, and seven stages later gets a draft they can trust, or a clear reason why not.",
+        ],
+        steps: [
+          "Suppression check",
+          "Identity check",
+          "Research",
+          "Signal extraction",
+          "Scoring & hook selection",
+          "Drafting",
+          "Fact check & review",
+        ],
+      },
+      {
+        title: "Scoring: Picking the Hook",
+        paras: [
+          "The hook is chosen by rule-based Python, not the LLM. Each signal scores 0 to 100: score = round( min(100, base + boosts) × recency ). Every score carries the rule IDs that fired, so the UI can explain it in one line.",
+        ],
+        table: {
+          headers: ["Component", "Rule"],
+          rows: [
+            [
+              "Base (by type)",
+              "From 60 for finance-ops hiring down to 20 for other news; negative news is blocked",
+            ],
+            [
+              "Boosts",
+              "+15 about the person, +10 high confidence, +15 matches persona angle, +5 trusted source",
+            ],
+            [
+              "Recency",
+              "×1.0 under 30 days, ×0.85 up to 120, ×0.4 up to 365, blocked after a year; ×0.5 and never the hook if undated",
+            ],
+            [
+              "Hook",
+              "Highest unblocked signal matching the persona's angle; ties go to newer, then person-level",
+            ],
+            ["Status", "Draft ready (≥ 60), Ready with weak signal (35 to 59), or Needs rep input"],
+          ],
+        },
+        quote:
+          "Chose the AP hiring post: it's 18 days old, from the company's own careers page, and points straight at invoice volume, the CFO's angle. (90, beating a 75-day-old funding round at 64)",
+      },
+      {
+        title: "Edge Cases & Guardrails",
+        table: {
+          headers: ["Case", "What happens", "What the rep sees"],
+          rows: [
+            [
+              "Identity checks",
+              "Confirms the right person at their current company before scoring; low-confidence matches are never the hook",
+              '"Skipped: not sure this is the same person or company"',
+            ],
+            [
+              "No usable signal",
+              "No signals, or only weak ones",
+              "Ready, weak signal: a company- or industry-level opener with no specific claim",
+            ],
+            [
+              "Only negative news",
+              "Every signal is a layoff, lawsuit or similar",
+              "Needs rep input; nothing negative is ever an opener",
+            ],
+            [
+              "Off-persona signal",
+              "Strongest signal fits a different buyer",
+              'Needs rep input + suggested persona: "Hiring SDRs fits a VP Sales, not this CFO"',
+            ],
+          ],
+        },
+        bullets: [
+          "Grounded claims only: every claim is matched against a stored source quote.",
+          "Human in the loop: nothing is sent; the rep reviews every draft.",
+          'Voice rules: under 120 words; hook → relevance → one line on the seller → soft ask; subject of 6 words or fewer; no spam words, links or "book a demo".',
+          "Approved proof only: at most one proof point per email; customers and numbers are never invented.",
+        ],
+      },
+    ],
+    outcomes: [
+      "Turns ~20 minutes of manual research per prospect into one run that returns a hook, two backups, a status and a draft.",
+      "Every choice is explainable: a score, the rules that fired and a one-line reason.",
+      "Fails safe: when evidence is weak, negative or off-persona, it says less or asks the rep instead of inventing.",
+    ],
+    keyLearnings: [
+      "Signal relevance is seller-specific. The same funding round is a strong hook for one seller and noise for another, so all weights live in config.",
+      "Splitting judgment (LLM) from decisions (code) made the agent far easier to debug and to explain to a non-technical buyer.",
+      "Contracts first, code second: writing the schema before prompting removed most format errors.",
+      "Next: a feedback loop that retunes weights from reply rates, batch runs over a full prospect list, and CRM write-back once a rep approves a draft.",
+    ],
+  },
+  {
+    slug: "saleshandy-mcp",
+    title: "Saleshandy MCP Setup",
+    desc: "The live MCP (AI Assistants) page in Saleshandy, which lets users connect ChatGPT, Claude, Cursor and more to their account. I designed and built the production UI myself, with no designer or frontend engineer.",
+    tag: "AI · SaaS",
+    sub: "Live in Production · Design + Build",
+    img: mcpCoverImg,
+    status: "Live in production",
+    duration: "Shipped to production",
+    role: "Product Manager · Designer · Builder",
+    stack: ["MCP", "OAuth 2.1", "AI-assisted Coding", "UI/UX Design", "Product Copy"],
+    overview: [
+      'MCP (Model Context Protocol) lets AI assistants like Claude, ChatGPT and Cursor act directly inside Saleshandy. A user can type "Create a 5-step follow-up sequence for demo no-shows" instead of clicking through five screens to do it by hand.',
+      "The protocol only matters if users can connect it. I owned that experience end to end: the MCP page under API & Integrations, the explainer, and a guided two-step setup flow for every supported client. I wrote the copy, designed the screens and built the production UI myself, using AI coding tools. No designer and no frontend engineer worked on it.",
+      "What you see below is not a mockup. It is the real interface Saleshandy customers use today.",
+    ],
+    problem:
+      "MCP is new, technical and different for every client. ChatGPT needs Developer Mode and a custom app, Claude connects in the browser, Claude Code needs a terminal command, and VS Code and Cursor each have their own config. A sales user who just wants their AI assistant to work with Saleshandy would otherwise have to work this out from scattered developer docs.",
+    painPoints: [
+      'Most Saleshandy users are sales and marketing people, not developers, so words like "endpoint" and "OAuth" put them off.',
+      "Every client has a different setup path, so one generic instruction block leaves most users stuck.",
+      "Without context, users don't see why they should connect an AI assistant at all.",
+      "Setup errors (the wrong URL, a missing prerequisite) fail silently and turn into support tickets.",
+    ],
+    research: [
+      "Went through the setup flow of every target client (ChatGPT, Claude, Claude Code, VS Code, Cursor) myself and wrote down each step, prerequisite and failure point.",
+      "Grouped the clients by authentication method: OAuth 2.1 for the major assistants, and an API-key path for everything else.",
+      "Looked at where users would most likely drop off: plan or permission prerequisites (for example, ChatGPT Developer Mode) and finding the right settings screen.",
+    ],
+    keyInsight:
+      "Users don't need to understand MCP. They need to know what changes for them, and then follow three to six exact steps for the tool they already use.",
+    solutions: [
+      {
+        title: '"What is MCP?" in one comparison',
+        desc: "A dismissible explainer that puts the old way (Navigate → Click Create → Fill form → Add steps → Configure → Save) next to a single plain-English prompt. The value is clear before any setup starts.",
+      },
+      {
+        title: "Step 1: pick your client",
+        desc: "A grid of six clients (ChatGPT, Claude, Claude Code CLI, VS Code, Cursor IDE, Other Tool), each with a short description and a badge for its auth method: OAuth 2.1 or Connect with API.",
+      },
+      {
+        title: "Step 2: instructions for that client",
+        desc: 'A prerequisite banner (for example, "ChatGPT Plus/Team account, Developer Mode enabled"), a one-click copy of the endpoint URL, and numbered steps that use the client\'s own menu names.',
+      },
+      {
+        title: "Deep link to finish the job",
+        desc: 'A "Go to ChatGPT Settings" style button takes users to the exact screen they need, and a clear Back / Done footer keeps the flow short and reversible.',
+      },
+    ],
+    gallery: [
+      {
+        src: mcpPageImg,
+        caption:
+          'The MCP (AI Assistants) page under API & Integrations, with the "What is MCP?" explainer comparing the manual flow to one prompt.',
+      },
+      {
+        src: mcpStep1Img,
+        caption:
+          "Step 1 of 2: choose your MCP client. Each card shows its auth method (OAuth 2.1 or Connect with API).",
+      },
+      {
+        src: mcpStep2Img,
+        caption:
+          "Step 2 of 2 for ChatGPT: prerequisite banner, one-click endpoint copy, numbered steps and a deep link to ChatGPT settings.",
+      },
+    ],
+    extraSections: [
+      {
+        title: "Built Without a Design or Frontend Team",
+        paras: [
+          "This project shows that I can take a feature from idea to production on my own. I went from the protocol docs to a shipped UI without handing anything off. I made the information architecture, visual and copy decisions, then built the screens to match Saleshandy's existing design system so they look native to the product.",
+          "AI tools did the heavy lifting on code. My judgment decided what the user sees, in what order and in what words.",
+        ],
+        bullets: [
+          "Design: layout, component choices, states and spacing, matched to the existing Saleshandy UI.",
+          "Content: every label, description, prerequisite and instruction, written for non-technical users.",
+          "Build: production frontend, put together with AI-assisted coding and shipped live.",
+        ],
+      },
+    ],
+    outcomes: [
+      "Shipped to production: the MCP page and two-step setup are live for Saleshandy customers.",
+      "One flow covers six clients, with both OAuth 2.1 and API-key authentication.",
+      "Turned a developer-only setup into one a non-technical sales user can finish on their own.",
+    ],
+    keyLearnings: [
+      "In a new technology, the setup UX is the product. If users can't connect it, nothing else matters.",
+      "Splitting setup by client, instead of writing one generic guide, removed most of the confusion.",
+      "AI tools let a PM ship production UI, but taste, copy and edge-case thinking still come from the person using them.",
+    ],
   },
   {
     slug: "claimwise",
@@ -394,13 +688,49 @@ export const works: Work[] = [
       title: "India Streaming Competitive Benchmark",
       headers: ["Feature", "Spotify", "JioSaavn", "YouTube Music", "Apple Music"],
       rows: [
-        ["Market Position", "Global Leader (32.9%)", "Strong Regional Focus (24%)", "Video Dominance (15%)", "Premium Base (10%)"],
-        ["Freemium Tier", "Yes (Ad-supported)", "Yes (Ad-supported)", "Yes (Ad-supported)", "No Free Tier (Trial only)"],
-        ["AI Recommendations", "Strong (Discover Weekly)", "Moderate", "Good (Watch history)", "Strong (Curated)"],
-        ["Exclusive Content", "Podcasts & Audiobooks", "Limited", "YouTube Originals", "Exclusive Artist Deals"],
-        ["Regional Music Focus", "Expanding", "Strong (Indian Languages)", "Good (Bollywood/Indie)", "Limited"],
+        [
+          "Market Position",
+          "Global Leader (32.9%)",
+          "Strong Regional Focus (24%)",
+          "Video Dominance (15%)",
+          "Premium Base (10%)",
+        ],
+        [
+          "Freemium Tier",
+          "Yes (Ad-supported)",
+          "Yes (Ad-supported)",
+          "Yes (Ad-supported)",
+          "No Free Tier (Trial only)",
+        ],
+        [
+          "AI Recommendations",
+          "Strong (Discover Weekly)",
+          "Moderate",
+          "Good (Watch history)",
+          "Strong (Curated)",
+        ],
+        [
+          "Exclusive Content",
+          "Podcasts & Audiobooks",
+          "Limited",
+          "YouTube Originals",
+          "Exclusive Artist Deals",
+        ],
+        [
+          "Regional Music Focus",
+          "Expanding",
+          "Strong (Indian Languages)",
+          "Good (Bollywood/Indie)",
+          "Limited",
+        ],
         ["Social Features", "Collaborative Playlists", "Limited", "Comments & Sharing", "Minimal"],
-        ["India Pricing (Individual)", "₹119 / month", "₹99 / month", "₹109 / month", "₹99 / month"],
+        [
+          "India Pricing (Individual)",
+          "₹119 / month",
+          "₹99 / month",
+          "₹109 / month",
+          "₹99 / month",
+        ],
       ],
     },
     research: [

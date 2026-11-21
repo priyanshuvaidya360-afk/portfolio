@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" font-family="Inter, Segoe UI, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2e1065"/>
+      <stop offset="0.55" stop-color="#4c1d95"/>
+      <stop offset="1" stop-color="#7e22ce"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.8" cy="0.15" r="0.6">
+      <stop offset="0" stop-color="#c084fc" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#c084fc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect width="1600" height="1000" fill="url(#glow)"/>
+
+  <text x="100" y="150" fill="#e9d5ff" font-size="30" font-weight="600" letter-spacing="6">GTM SIGNAL · AI OUTREACH AGENT</text>
+  <text x="100" y="240" fill="#ffffff" font-size="76" font-weight="700">From prospect to personalised draft</text>
+
+  <!-- Pipeline -->
+  <g font-size="26" font-weight="600">
+    <g transform="translate(100,330)">
+      <rect width="240" height="120" rx="22" fill="#ffffff" fill-opacity="0.1" stroke="#e9d5ff" stroke-opacity="0.4"/>
+      <text x="120" y="54" text-anchor="middle" fill="#fff">Prospect</text>
+      <text x="120" y="88" text-anchor="middle" fill="#e9d5ff" font-size="20" font-weight="400">name + company</text>
+    </g>
+    <g transform="translate(400,330)">
+      <rect width="240" height="120" rx="22" fill="#ffffff" fill-opacity="0.1" stroke="#e9d5ff" stroke-opacity="0.4"/>
+      <text x="120" y="54" text-anchor="middle" fill="#fff">Research</text>
+      <text x="120" y="88" text-anchor="middle" fill="#e9d5ff" font-size="20" font-weight="400">LLM · web</text>
+    </g>
+    <g transform="translate(700,330)">
+      <rect width="240" height="120" rx="22" fill="#ffffff" fill-opacity="0.1" stroke="#e9d5ff" stroke-opacity="0.4"/>
+      <text x="120" y="54" text-anchor="middle" fill="#fff">Signals</text>
+      <text x="120" y="88" text-anchor="middle" fill="#e9d5ff" font-size="20" font-weight="400">17 types · quoted</text>
+    </g>
+    <g transform="translate(1000,330)">
+      <rect width="240" height="120" rx="22" fill="#c084fc" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2"/>
+      <text x="120" y="54" text-anchor="middle" fill="#2e1065">Score</text>
+      <text x="120" y="88" text-anchor="middle" fill="#3b0764" font-size="20" font-weight="500">rules · no LLM</text>
+    </g>
+    <g transform="translate(1300,330)">
+      <rect width="200" height="120" rx="22" fill="#ffffff" fill-opacity="0.1" stroke="#e9d5ff" stroke-opacity="0.4"/>
+      <text x="100" y="54" text-anchor="middle" fill="#fff">Draft</text>
+      <text x="100" y="88" text-anchor="middle" fill="#e9d5ff" font-size="20" font-weight="400">fact-checked</text>
+    </g>
+    <g stroke="#e9d5ff" stroke-width="3" fill="none" stroke-opacity="0.8">
+      <path d="M345 390h50M645 390h50M945 390h50M1245 390h50"/>
+    </g>
+  </g>
+
+  <!-- Signal cards -->
+  <g transform="translate(100,520)">
+    <rect width="860" height="380" rx="28" fill="#ffffff"/>
+    <text x="40" y="62" fill="#6d28d9" font-size="22" font-weight="700" letter-spacing="3">RANKED SIGNALS</text>
+
+    <g transform="translate(40,100)">
+      <rect width="780" height="72" rx="16" fill="#f5f0ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="24" y="45" fill="#2e1065" font-size="24" font-weight="600">AP Specialist job post · 18 days</text>
+      <rect x="640" y="18" width="116" height="36" rx="18" fill="#7c3aed"/>
+      <text x="698" y="43" text-anchor="middle" fill="#fff" font-size="20" font-weight="700">HOOK · 90</text>
+    </g>
+    <g transform="translate(40,190)">
+      <rect width="780" height="72" rx="16" fill="#faf7fd"/>
+      <text x="24" y="45" fill="#2e1065" font-size="24" font-weight="500">Series C funding round · 75 days</text>
+      <text x="740" y="45" text-anchor="end" fill="#6d28d9" font-size="22" font-weight="700">64</text>
+    </g>
+    <g transform="translate(40,280)">
+      <rect width="780" height="72" rx="16" fill="#faf7fd"/>
+      <text x="24" y="45" fill="#2e1065" font-size="24" font-weight="500">New VP Finance appointed · 140 days</text>
+      <text x="740" y="45" text-anchor="end" fill="#6d28d9" font-size="22" font-weight="700">31</text>
+    </g>
+  </g>
+
+  <!-- Draft card -->
+  <g transform="translate(1010,520)">
+    <rect width="490" height="380" rx="28" fill="#ffffff" fill-opacity="0.12" stroke="#e9d5ff" stroke-opacity="0.5"/>
+    <rect x="36" y="36" width="170" height="40" rx="20" fill="#22c55e" fill-opacity="0.2"/>
+    <text x="121" y="63" text-anchor="middle" fill="#bbf7d0" font-size="20" font-weight="700">DRAFT READY</text>
+    <g fill="#ffffff" fill-opacity="0.85">
+      <rect x="36" y="110" width="380" height="16" rx="8"/>
+      <rect x="36" y="146" width="418" height="16" rx="8" fill-opacity="0.5"/>
+      <rect x="36" y="182" width="340" height="16" rx="8" fill-opacity="0.5"/>
+      <rect x="36" y="218" width="400" height="16" rx="8" fill-opacity="0.5"/>
+      <rect x="36" y="254" width="260" height="16" rx="8" fill-opacity="0.5"/>
+    </g>
+    <text x="36" y="330" fill="#e9d5ff" font-size="20">✓ every claim matched to a source quote</text>
+  </g>
+</svg>

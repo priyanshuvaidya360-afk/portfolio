@@ -1,5 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getWork, works, type Work } from "@/lib/works";
+import { useEffect, useState, type ReactNode } from "react";
+import { getWork, works, type TableBlock, type Work } from "@/lib/works";
+import { cn } from "@/lib/utils";
+import { SiteNav } from "@/components/site/nav";
+import { SiteFooter } from "@/components/site/contact";
+import { Button, Reveal, StatCallout, Tag, glowMove } from "@/components/site/ui";
 
 export const Route = createFileRoute("/work/$slug")({
   loader: ({ params }) => {
@@ -24,21 +29,21 @@ export const Route = createFileRoute("/work/$slug")({
     };
   },
   notFoundComponent: () => (
-    <div className="min-h-screen flex items-center justify-center bg-[#faf7fd]">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4 text-ink">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-[#2e1065]">Project not found</h1>
-        <Link to="/" className="mt-4 inline-block text-[#7c3aed] underline font-medium">
-          Back home
+        <h1 className="t-h2">This page took a day off</h1>
+        <Link to="/" className="link-u mt-6 inline-block font-medium text-brand-ink">
+          Take me home
         </Link>
       </div>
     </div>
   ),
   errorComponent: ({ error, reset }) => (
-    <div className="min-h-screen flex items-center justify-center bg-[#faf7fd]">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4 text-ink">
       <div className="text-center">
-        <p className="text-[#2e1065]">{error.message}</p>
-        <button onClick={reset} className="mt-4 text-[#7c3aed] underline font-medium">
-          Retry
+        <p>{error.message}</p>
+        <button onClick={reset} className="link-u mt-4 font-medium text-brand-ink">
+          Try again
         </button>
       </div>
     </div>
@@ -46,382 +51,543 @@ export const Route = createFileRoute("/work/$slug")({
   component: WorkDetail,
 });
 
+type Block = { id: string; title: string; body: ReactNode };
+
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+/** Builds the ordered list of sections that exist for this project. */
+function buildSections(w: Work): Block[] {
+  const out: Block[] = [];
+  const add = (title: string, body: ReactNode) => {
+    let id = slugify(title);
+    while (out.some((b) => b.id === id)) id += "-2";
+    out.push({ id, title, body });
+  };
+
+  if (w.overview?.length) {
+    add(
+      "The big picture",
+      <div className="space-y-5">
+        {w.overview.map((p, i) => (
+          <p
+            key={i}
+            className={cn(
+              "prose-measure",
+              i === 0 && "text-[clamp(20px,1.5vw,24px)] leading-[1.5] tracking-[-0.01em]",
+            )}
+          >
+            {p}
+          </p>
+        ))}
+      </div>,
+    );
+  }
+
+  if (w.problem || w.painPoints?.length) {
+    add(
+      "The problem",
+      <>
+        {w.problemSource && (
+          <a
+            href={w.problemSource.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group mb-10 flex flex-col gap-2 rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-brand sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6"
+          >
+            <span>
+              <span className="t-label !text-brand-ink">
+                Problem statement by {w.problemSource.org}
+              </span>
+              <span className="mt-2 block text-lg font-medium tracking-[-0.01em]">
+                &ldquo;{w.problemSource.title}&rdquo;
+              </span>
+              <span className="mt-1 block font-mono text-[13px] text-subtle">
+                {w.problemSource.publication} · {w.problemSource.date}
+              </span>
+            </span>
+            <span className="shrink-0 font-medium text-brand-ink">
+              Read the source{" "}
+              <span
+                aria-hidden
+                className="inline-block transition-transform group-hover:translate-x-0.5"
+              >
+                ↗
+              </span>
+            </span>
+          </a>
+        )}
+        {w.problem && (
+          <p className="prose-measure text-[clamp(20px,1.5vw,24px)] leading-[1.5] tracking-[-0.01em]">
+            {w.problem}
+          </p>
+        )}
+        {w.painPoints && w.painPoints.length > 0 && (
+          <div className="mt-10">
+            <div className="t-label mb-4">
+              Where it hurts{w.problemSource && ` · as stated by ${w.problemSource.org}`}
+            </div>
+            <NumberedList items={w.painPoints} />
+          </div>
+        )}
+      </>,
+    );
+  }
+
+  if (w.research?.length || w.keyInsight || w.opportunity || w.successVision) {
+    add(
+      "What I found out",
+      <>
+        {w.research && w.research.length > 0 && <BulletList items={w.research} />}
+        <div className="mt-8 space-y-4">
+          {w.keyInsight && (
+            <Callout label="The aha moment" tone="brand">
+              {w.keyInsight}
+            </Callout>
+          )}
+          {w.opportunity && <Callout label="The gap I saw">{w.opportunity}</Callout>}
+          {w.successVision && <Callout label="What success looks like">{w.successVision}</Callout>}
+        </div>
+      </>,
+    );
+  }
+
+  if (w.table) add(w.table.title || "The numbers", <DataTable table={w.table} />);
+
+  if (w.gallery?.length) {
+    add(
+      "Screens from production",
+      <div className="space-y-10">
+        {w.gallery.map((g, i) => (
+          <figure key={i}>
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface-2 p-2 sm:p-3">
+              <img
+                src={g.src}
+                alt={g.caption}
+                loading="lazy"
+                decoding="async"
+                className="h-auto w-full rounded-xl"
+              />
+            </div>
+            <figcaption className="prose-measure mt-4 flex gap-3 text-[15px] leading-relaxed text-subtle">
+              <span className="font-mono text-brand-ink">{String(i + 1).padStart(2, "0")}</span>
+              {g.caption}
+            </figcaption>
+          </figure>
+        ))}
+      </div>,
+    );
+  }
+
+  if (w.solutions?.length) {
+    add(
+      "The fix",
+      <div className="grid gap-4 sm:grid-cols-2">
+        {w.solutions.map((s, i) => (
+          <div
+            key={i}
+            onPointerMove={glowMove}
+            className="glow lift rounded-2xl border border-line bg-surface p-6"
+          >
+            <div className="font-mono text-[13px] text-brand-ink">
+              {String(i + 1).padStart(2, "0")}
+            </div>
+            <div className="mt-4 text-lg font-semibold tracking-[-0.02em]">{s.title}</div>
+            <p className="mt-2 text-[15px] leading-relaxed text-subtle">{s.desc}</p>
+          </div>
+        ))}
+      </div>,
+    );
+  }
+
+  if (w.keyChallenges) {
+    add(
+      "What got tricky",
+      <p className="prose-measure text-[clamp(20px,1.5vw,24px)] leading-[1.5] tracking-[-0.01em]">
+        {w.keyChallenges}
+      </p>,
+    );
+  }
+
+  for (const sec of w.extraSections ?? []) {
+    add(
+      sec.title,
+      <div className="space-y-6">
+        {sec.paras?.map((p, j) => (
+          <p key={j} className="prose-measure">
+            {p}
+          </p>
+        ))}
+        {sec.stats && sec.stats.length > 0 && <StatGrid stats={sec.stats} />}
+        {sec.bullets && sec.bullets.length > 0 && <BulletList items={sec.bullets} />}
+        {sec.steps && sec.steps.length > 0 && (
+          <ol className="grid gap-2 sm:grid-cols-2">
+            {sec.steps.map((st, j) => (
+              <li
+                key={j}
+                className="flex items-center gap-4 rounded-2xl border border-line bg-surface px-4 py-3"
+              >
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--brand-soft)] font-mono text-[13px] text-brand-ink">
+                  {j + 1}
+                </span>
+                <span className="text-[15px]">{st}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+        {sec.table && <DataTable table={sec.table} />}
+        {sec.quote && (
+          <blockquote className="border-l-2 border-brand py-1 pl-6">
+            <p className="prose-measure serif-accent text-[clamp(22px,2vw,30px)] leading-[1.3] text-ink">
+              “{sec.quote}”
+            </p>
+          </blockquote>
+        )}
+      </div>,
+    );
+  }
+
+  if (w.outcomes?.length) add("What changed", <NumberedList items={w.outcomes} />);
+  if (w.keyLearnings?.length) add("What I learned", <BulletList items={w.keyLearnings} />);
+
+  return out;
+}
+
 function WorkDetail() {
   const { work: w } = Route.useLoaderData() as { work: Work };
   const nextIdx = (works.findIndex((x) => x.slug === w.slug) + 1) % works.length;
   const next = works[nextIdx];
+  const sections = buildSections(w);
+  const active = useActiveSection(
+    sections.map((s) => s.id),
+    w.slug,
+  );
+  const prototypeHref = w.prototype || w.href;
 
   return (
-    <div className="min-h-screen bg-[#faf7fd] text-[#2e1065]">
-      {/* Nav */}
-      <nav className="sticky top-0 z-30 bg-[#faf7fd]/80 backdrop-blur border-b border-[#7c3aed]/10">
-        <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="font-semibold tracking-tight text-[#2e1065] hover:text-[#7c3aed] transition">
-            ← Priyanshu Vaidya
-          </Link>
-          <div className="flex items-center gap-6 text-sm">
-            <Link to="/" hash="work" className="hover:text-[#7c3aed] font-medium">
-              Work
+    <div className="min-h-screen bg-canvas text-ink">
+      <SiteNav />
+      <main id="main">
+        {/* Hero */}
+        <header id="top" className="mx-auto max-w-[1280px] px-4 pb-12 pt-32 sm:px-6 md:pt-40">
+          <Reveal>
+            <Link
+              to="/"
+              hash="work"
+              className="link-u font-mono text-[13px] text-subtle hover:text-ink"
+            >
+              ← All work
             </Link>
-            <a
-              href="https://drive.google.com/file/d/1Rmc_A1Dk5Ii5ILP0XCpduIw_kiPYCNif/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#7c3aed] font-medium flex items-center gap-1"
-            >
-              Resume ↗
-            </a>
-            <a
-              href={w.prototype || w.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-[#3b0764] text-white px-4 py-2 hover:bg-[#581c87] transition font-medium shadow-sm"
-            >
-              View Prototype ↗
-            </a>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 pt-16 pb-10">
-        <div className="flex items-center gap-2 text-xs mb-6">
-          <span className="rounded-full bg-[#7c3aed]/10 text-[#7c3aed] px-3 py-1 font-medium">
-            {w.tag}
-          </span>
-          <span className="rounded-full bg-[#c084fc]/15 text-[#6d28d9] px-3 py-1 font-medium">
-            {w.sub}
-          </span>
-        </div>
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-[#2e1065]">
-          {w.title}
-        </h1>
-        <p className="mt-4 text-lg text-[#2e1065]/75 max-w-3xl leading-relaxed">{w.desc}</p>
-        <div className="mt-10 rounded-3xl overflow-hidden aspect-[16/8] bg-[#f5f0ff] border border-[#7c3aed]/10 shadow-sm">
-          <img src={w.img} alt={w.title} className="w-full h-full object-cover" />
-        </div>
-      </section>
-
-      {/* Body with sidebar */}
-      <section className="mx-auto max-w-6xl px-6 pb-24 grid md:grid-cols-[280px_1fr] gap-10">
-        {/* Sidebar */}
-        <aside className="space-y-4 md:sticky md:top-24 self-start">
-          <SidebarCard label="Duration" value={w.duration} />
-          <SidebarCard label="Role" value={w.role} />
-          <div className="rounded-2xl bg-white border border-[#7c3aed]/10 p-6 shadow-sm">
-            <div className="text-lg font-semibold mb-4 text-[#2e1065]">Tech Stack</div>
-            <div className="flex flex-wrap gap-2">
-              {w.stack.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full bg-[#f5f0ff] text-[#6d28d9] px-3 py-1 text-sm font-medium"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-          <a
-            href={w.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block rounded-2xl bg-[#3b0764] text-white p-5 text-center font-semibold hover:bg-[#581c87] transition shadow-sm"
+          </Reveal>
+          <Reveal delay={40} className="mt-8 flex flex-wrap gap-2">
+            <Tag tone="brand">{w.tag}</Tag>
+            <Tag>{w.sub}</Tag>
+            {w.status && <Tag tone="live">{w.status}</Tag>}
+          </Reveal>
+          <Reveal as="h1" delay={80} className="t-h1 mt-6 max-w-[16ch]">
+            {w.title}
+          </Reveal>
+          <Reveal
+            as="p"
+            delay={120}
+            className="prose-measure mt-6 text-[clamp(19px,1.5vw,24px)] leading-[1.5] text-subtle"
           >
-            View Full Document ↗
-          </a>
-        </aside>
+            {w.desc}
+          </Reveal>
 
-        {/* Content */}
-        <article className="space-y-14">
-          {w.overview && w.overview.length > 0 && (
-            <Section title="Project Overview">
-              {w.overview.map((p, i) => (
-                <p key={i} className="text-[#2e1065]/80 leading-relaxed text-lg mb-4 last:mb-0">
-                  {p}
-                </p>
-              ))}
-            </Section>
-          )}
-
-          {w.stats && w.stats.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {w.stats.map((st, i) => (
-                <div key={i} className="rounded-2xl bg-white border border-[#7c3aed]/10 p-5 text-center shadow-sm">
-                  <div className="text-3xl font-bold text-[#7c3aed]">{st.value}</div>
-                  <div className="text-sm text-[#2e1065]/70 mt-1">{st.label}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {(w.problem || (w.painPoints && w.painPoints.length > 0)) && (
-            <Section title="The Problem">
-              {w.problem && <p className="text-[#2e1065]/80 leading-relaxed text-lg">{w.problem}</p>}
-              {w.painPoints && w.painPoints.length > 0 && (
-                <div className="mt-6">
-                  <div className="font-semibold mb-3 text-[#2e1065]">Key Pain Points</div>
-                  <ul className="list-disc pl-5 space-y-2 text-[#2e1065]/80">
-                    {w.painPoints.map((p, i) => (
-                      <li key={i}>{p}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {(w.research || w.keyInsight || w.opportunity || w.successVision) && (
-            <Section title="Research & Discovery">
-              {w.research && w.research.length > 0 && (
-                <ul className="list-disc pl-5 space-y-2 text-[#2e1065]/80">
-                  {w.research.map((p, i) => (
-                    <li key={i}>{p}</li>
-                  ))}
-                </ul>
-              )}
-              {w.keyInsight && (
-                <div className="mt-6 rounded-2xl bg-[#faf5ff] border border-[#7c3aed]/20 p-6 shadow-sm">
-                  <div className="text-xs uppercase tracking-wider text-[#7c3aed] font-semibold">
-                    Key Insight
-                  </div>
-                  <p className="mt-2 text-[#2e1065]/85 leading-relaxed">
-                    {w.keyInsight}
-                  </p>
-                </div>
-              )}
-              {w.opportunity && (
-                <div className="mt-4 rounded-2xl bg-white border border-[#7c3aed]/10 p-6 shadow-sm">
-                  <div className="text-xs uppercase tracking-wider text-[#6d28d9] font-semibold">
-                    Opportunity
-                  </div>
-                  <p className="mt-2 text-[#2e1065]/85 leading-relaxed italic">
-                    {w.opportunity}
-                  </p>
-                </div>
-              )}
-              {w.successVision && (
-                <div className="mt-4 rounded-2xl bg-white border border-[#7c3aed]/10 p-6 shadow-sm">
-                  <div className="text-xs uppercase tracking-wider text-[#6d28d9] font-semibold">
-                    Success Vision
-                  </div>
-                  <p className="mt-2 text-[#2e1065]/85 leading-relaxed">
-                    {w.successVision}
-                  </p>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {w.table && (
-            <Section title={w.table.title || "Data & Analysis"}>
-              <div className="overflow-x-auto rounded-2xl border border-[#7c3aed]/15 bg-white shadow-sm">
-                <table className="w-full text-left text-sm text-[#2e1065]">
-                  <thead className="bg-[#f5f0ff] border-b border-[#7c3aed]/15">
-                    <tr>
-                      {w.table.headers.map((h, i) => (
-                        <th key={i} className="px-4 py-3 font-semibold text-[#2e1065]">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#7c3aed]/10">
-                    {w.table.rows.map((row, i) => (
-                      <tr key={i}>
-                        {row.map((cell, j) => (
-                          <td key={j} className="px-4 py-3">{cell}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {w.table.note && (
-                <p className="text-xs text-[#2e1065]/60 mt-2 italic">{w.table.note}</p>
-              )}
-            </Section>
-          )}
-
-          {w.solutions && w.solutions.length > 0 && (
-            <Section title="Solutions">
-              <div className="grid sm:grid-cols-2 gap-4">
-                {w.solutions.map((s, i) => (
-                  <div
-                    key={i}
-                    className="rounded-2xl bg-white border border-[#7c3aed]/10 p-6 hover:shadow-md transition"
-                  >
-                    <div className="font-semibold text-[#2e1065]">{s.title}</div>
-                    <p className="mt-2 text-[#2e1065]/75 text-sm leading-relaxed">
-                      {s.desc}
-                    </p>
-                  </div>
+          <Reveal
+            delay={160}
+            className="mt-10 grid gap-6 border-t border-line pt-8 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_2fr_auto] lg:items-start"
+          >
+            <MetaItem label="Timeline">{w.duration}</MetaItem>
+            <MetaItem label="My role">{w.role}</MetaItem>
+            <MetaItem label="Toolkit">
+              <div className="flex flex-wrap gap-1.5">
+                {w.stack.map((t) => (
+                  <Tag key={t}>{t}</Tag>
                 ))}
               </div>
-            </Section>
-          )}
+            </MetaItem>
+            {prototypeHref && (
+              <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-1 lg:justify-end">
+                <Button href={prototypeHref} external magnetic>
+                  {w.prototypeLabel?.replace(/\s*↗$/, "") || "Try the prototype"} ↗
+                </Button>
+              </div>
+            )}
+          </Reveal>
 
-          {w.keyChallenges && (
-            <Section title="Key Challenges">
-              <p className="text-[#2e1065]/80 leading-relaxed text-lg">
-                {w.keyChallenges}
-              </p>
-            </Section>
-          )}
+          <Reveal
+            delay={200}
+            className="mt-12 overflow-hidden rounded-3xl border border-line bg-surface-2"
+          >
+            <img
+              src={w.img}
+              alt={w.title}
+              decoding="async"
+              className="aspect-[16/9] w-full object-cover md:aspect-[2/1]"
+            />
+          </Reveal>
+        </header>
 
-          {w.extraSections && w.extraSections.length > 0 && (
-            <>
-              {w.extraSections.map((sec, i) => (
-                <Section key={i} title={sec.title}>
-                  {sec.paras && sec.paras.map((p, j) => (
-                    <p key={j} className="text-[#2e1065]/80 leading-relaxed text-lg mb-4 last:mb-0">
-                      {p}
-                    </p>
-                  ))}
-                  {sec.bullets && sec.bullets.length > 0 && (
-                    <ul className="list-disc pl-5 space-y-2 text-[#2e1065]/80 mt-3">
-                      {sec.bullets.map((b, j) => (
-                        <li key={j}>{b}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {sec.steps && sec.steps.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {sec.steps.map((st, j) => (
-                        <span key={j} className="rounded-xl bg-white border border-[#7c3aed]/15 px-3 py-1.5 text-sm text-[#2e1065] flex items-center gap-1.5 shadow-sm">
-                          <span className="font-bold text-[#7c3aed]">{j + 1}.</span> {st}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {sec.table && (
-                    <div className="mt-4 overflow-x-auto rounded-2xl border border-[#7c3aed]/15 bg-white shadow-sm">
-                      <table className="w-full text-left text-sm text-[#2e1065]">
-                        <thead className="bg-[#f5f0ff] border-b border-[#7c3aed]/15">
-                          <tr>
-                            {sec.table.headers.map((h, k) => (
-                              <th key={k} className="px-4 py-3 font-semibold">{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#7c3aed]/10">
-                          {sec.table.rows.map((row, k) => (
-                            <tr key={k}>
-                              {row.map((cell, l) => (
-                                <td key={l} className="px-4 py-3">{cell}</td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {sec.table.note && (
-                        <p className="text-xs text-[#2e1065]/60 p-2 italic">{sec.table.note}</p>
+        {/* Headline stats */}
+        {w.stats && w.stats.length > 0 && (
+          <section aria-label="Key numbers" className="mx-auto max-w-[1280px] px-4 sm:px-6">
+            <StatGrid stats={w.stats} big />
+          </section>
+        )}
+
+        {/* Body */}
+        <div className="mx-auto grid max-w-[1280px] gap-12 px-4 py-20 sm:px-6 md:py-28 lg:grid-cols-12">
+          <aside className="hidden lg:col-span-3 lg:block">
+            <nav aria-label="Jump to a section" className="sticky top-28">
+              <div className="t-label mb-4">Jump to</div>
+              <ol className="space-y-1 border-l border-line">
+                {sections.map((s, i) => (
+                  <li key={s.id}>
+                    <a
+                      href={`#${s.id}`}
+                      className={cn(
+                        "-ml-px flex gap-3 border-l py-1.5 pl-4 text-[14px] leading-snug transition-colors",
+                        active === s.id
+                          ? "border-brand text-ink"
+                          : "border-transparent text-subtle hover:text-ink",
                       )}
-                    </div>
-                  )}
-                  {sec.quote && (
-                    <blockquote className="mt-4 border-l-4 border-[#7c3aed] pl-4 italic text-[#2e1065]/85">
-                      "{sec.quote}"
-                    </blockquote>
-                  )}
-                </Section>
-              ))}
-            </>
-          )}
-
-          {w.outcomes && w.outcomes.length > 0 && (
-            <Section title="Outcomes & Impact">
-              <ul className="list-disc pl-5 space-y-2 text-[#2e1065]/80">
-                {w.outcomes.map((p, i) => (
-                  <li key={i}>{p}</li>
-                ))}
-              </ul>
-            </Section>
-          )}
-
-          {w.keyLearnings && w.keyLearnings.length > 0 && (
-            <Section title="Key Learnings">
-              <ul className="space-y-3">
-                {w.keyLearnings.map((p, i) => (
-                  <li
-                    key={i}
-                    className="flex gap-3 text-[#2e1065]/80 leading-relaxed"
-                  >
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#7c3aed] flex-shrink-0" />
-                    <span>{p}</span>
+                    >
+                      <span className="font-mono text-[12px] opacity-70">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      {s.title}
+                    </a>
                   </li>
                 ))}
-              </ul>
-            </Section>
-          )}
+              </ol>
+              {w.href && (
+                <a
+                  href={w.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-8 flex min-h-11 items-center justify-center rounded-full border border-line-strong px-4 text-[14px] font-medium transition-colors hover:border-ink/40"
+                >
+                  {w.docLabel || "Open the full doc ↗"}
+                </a>
+              )}
+            </nav>
+          </aside>
 
-          {w.href && (
-            <div className="rounded-3xl bg-gradient-to-br from-[#3b0764] via-[#581c87] to-[#7e22ce] text-white p-8 md:p-10 shadow-xl">
-              <div className="text-sm uppercase tracking-wider opacity-80">
-                Explore the full project documentation
-              </div>
-              <div className="mt-2 text-2xl font-semibold">
-                Read the complete case study, deck & design files
-              </div>
-              <a
-                href={w.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-5 rounded-full bg-white text-[#3b0764] px-6 py-3 font-bold hover:bg-[#faf5ff] transition shadow-md"
-              >
-                {w.ctaLabel || "Open Full Document ↗"}
-              </a>
-            </div>
-          )}
-        </article>
-      </section>
+          <article className="min-w-0 space-y-24 md:space-y-32 lg:col-span-9">
+            {sections.map((s, i) => (
+              <section key={s.id} id={s.id} aria-labelledby={`${s.id}-h`} className="scroll-mt-28">
+                <Reveal className="t-label mb-4 flex items-center gap-3">
+                  <span className="text-brand-ink">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="h-px w-8 bg-line-strong" aria-hidden />
+                </Reveal>
+                <Reveal as="h2" id={`${s.id}-h`} delay={40} className="t-h2 mb-10 max-w-[20ch]">
+                  {s.title}
+                </Reveal>
+                <Reveal delay={80} className="text-ink/90">
+                  {s.body}
+                </Reveal>
+              </section>
+            ))}
 
-      {/* Next project */}
-      <section className="mx-auto max-w-6xl px-6 pb-24">
-        <Link
-          to="/work/$slug"
-          params={{ slug: next.slug }}
-          className="group block rounded-3xl overflow-hidden bg-white border border-[#7c3aed]/10 hover:shadow-xl transition"
-        >
-          <div className="grid md:grid-cols-2">
-            <div className="aspect-[16/10] overflow-hidden bg-[#f5f0ff]">
-              <img
-                src={next.img}
-                alt={next.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-              />
-            </div>
-            <div className="p-8 flex flex-col justify-center">
-              <div className="text-sm text-[#2e1065]/50 font-medium">Next Project</div>
-              <div className="text-3xl font-semibold mt-2 text-[#2e1065]">{next.title}</div>
-              <div className="mt-2 text-[#2e1065]/75">{next.desc}</div>
-            </div>
-          </div>
-        </Link>
-      </section>
+            {w.href && (
+              <Reveal className="relative overflow-hidden rounded-3xl border border-line bg-surface p-8 md:p-12">
+                <div
+                  className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full blur-3xl"
+                  style={{ background: "var(--brand-soft)" }}
+                  aria-hidden
+                />
+                <div className="t-label relative">Want the deep dive?</div>
+                <div className="t-h3 relative mt-4 max-w-[28ch] text-[clamp(26px,2.6vw,36px)]">
+                  {w.ctaTitle || "The full deck, data and design files are one click away"}
+                </div>
+                <div className="relative mt-8">
+                  <Button href={w.href} external magnetic>
+                    {w.ctaLabel || "Open the deep dive ↗"}
+                  </Button>
+                </div>
+              </Reveal>
+            )}
+          </article>
+        </div>
+
+        {/* Next project */}
+        <section aria-label="Next project" className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-6">
+          <Reveal>
+            <Link
+              to="/work/$slug"
+              params={{ slug: next.slug }}
+              onPointerMove={glowMove}
+              className="glow lift group grid overflow-hidden rounded-3xl border border-line bg-surface md:grid-cols-2"
+            >
+              <div className="aspect-[16/10] overflow-hidden bg-surface-2">
+                <img
+                  src={next.img}
+                  alt={next.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="flex flex-col justify-center p-8 md:p-12">
+                <div className="t-label">Up next</div>
+                <div className="t-h2 mt-4">{next.title}</div>
+                <p className="mt-4 text-subtle">{next.desc}</p>
+                <span className="mt-8 inline-flex items-center gap-2 font-medium text-brand-ink">
+                  <span
+                    aria-hidden
+                    className="transition-transform duration-500 group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                </span>
+              </div>
+            </Link>
+          </Reveal>
+        </section>
+      </main>
+      <SiteFooter />
     </div>
   );
 }
 
-function SidebarCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-white border border-[#7c3aed]/10 p-6 text-center shadow-sm">
-      <div className="text-lg font-semibold text-[#2e1065]">{label}</div>
-      <div className="mt-2 text-[#2e1065]/75">{value}</div>
-    </div>
-  );
+/* ── Pieces ───────────────────────────────────────────────── */
+
+function useActiveSection(ids: string[], key: string) {
+  const [active, setActive] = useState<string | null>(ids[0] ?? null);
+  useEffect(() => {
+    const els = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-20% 0px -70% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return active;
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function MetaItem({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-5 text-[#2e1065]">
-        {title}
-      </h2>
-      {children}
+      <div className="t-label mb-2">{label}</div>
+      <div className="text-[15px]">{children}</div>
+    </div>
+  );
+}
+
+function StatGrid({ stats, big }: { stats: { value: string; label: string }[]; big?: boolean }) {
+  return (
+    <div
+      className={cn(
+        "grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line",
+        stats.length >= 4 ? "lg:grid-cols-4" : stats.length === 3 ? "md:grid-cols-3" : "",
+      )}
+    >
+      {stats.map((s, i) => (
+        <Reveal key={i} delay={i * 60} className={cn("bg-surface", big ? "p-6 md:p-10" : "p-6")}>
+          <StatCallout value={s.value} label={s.label} size={big ? "lg" : "md"} />
+        </Reveal>
+      ))}
+    </div>
+  );
+}
+
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="prose-measure space-y-4">
+      {items.map((p, i) => (
+        <li key={i} className="flex gap-4 leading-relaxed">
+          <span className="mt-[0.7em] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" aria-hidden />
+          <span>{p}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function NumberedList({ items }: { items: string[] }) {
+  return (
+    <ol className="divide-y divide-line border-y border-line">
+      {items.map((p, i) => (
+        <li key={i} className="grid grid-cols-[40px_1fr] gap-2 py-5 leading-relaxed">
+          <span className="pt-0.5 font-mono text-[13px] text-brand-ink">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <span className="prose-measure">{p}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function Callout({
+  label,
+  tone,
+  children,
+}: {
+  label: string;
+  tone?: "brand";
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border p-6 md:p-8",
+        tone === "brand" ? "border-transparent bg-[var(--brand-soft)]" : "border-line bg-surface",
+      )}
+    >
+      <div className={cn("t-label", tone === "brand" && "!text-brand-ink")}>{label}</div>
+      <p className="prose-measure mt-3 text-[clamp(18px,1.4vw,22px)] leading-[1.5] tracking-[-0.01em]">
+        {children}
+      </p>
+    </div>
+  );
+}
+
+function DataTable({ table }: { table: TableBlock }) {
+  return (
+    <div>
+      <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
+        <table className="w-full min-w-[520px] text-left text-[15px]">
+          <thead>
+            <tr className="border-b border-line">
+              {table.headers.map((h, i) => (
+                <th key={i} scope="col" className="t-label px-5 py-4 font-normal">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {table.rows.map((row, i) => (
+              <tr key={i} className="transition-colors hover:bg-surface-2">
+                {row.map((cell, j) => (
+                  <td
+                    key={j}
+                    className={cn("px-5 py-4 align-top leading-relaxed", j === 0 && "font-medium")}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {table.note && <p className="mt-3 font-mono text-[12px] text-subtle">{table.note}</p>}
     </div>
   );
 }
