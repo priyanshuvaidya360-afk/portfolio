@@ -41,7 +41,7 @@ export const Route = createFileRoute("/work/$slug")({
   errorComponent: ({ error, reset }) => (
     <div className="flex min-h-screen items-center justify-center bg-canvas px-4 text-ink">
       <div className="text-center">
-        <p>{error.message}</p>
+        <p>{error instanceof Error ? error.message : "Something went wrong."}</p>
         <button onClick={reset} className="link-u mt-4 font-medium text-brand-ink">
           Try again
         </button>
